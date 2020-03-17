@@ -40,37 +40,32 @@ setInterval(function() {
             if(element !== '') {
                 if(address.hasOwnProperty(element)) {
                     data.push(address[element]);
-                    if(--count <= 0) {
-                        heatmap.setData(data);
-                    }
+                    count--;
                 }
                 else {
                     var coords = getCoords(element);
                     if(coords['error'] === 'OK') {
                         address[element] = [coords['lat'], coords['long']];
                         data.push(address[element]);
-                        if(--count <= 0) {
-                            heatmap.setData(data);
-                        }
+                        count--;
                     }
                     else {
                         var myGeocoder = ymaps.geocode('Приволжский федеральный округ ' + element);
-                        myGeocoder.then(
-                            function (res) {
-                                address[element] = res.geoObjects.get(0).geometry.getCoordinates();
-                                console.log(count + ': ' + element + ' — ' + address[element][0] + ', ' + address[element][1]);
-                                putCoords(element, address[element][0], address[element][1]);
-                                data.push(address[element]);
-                                if(--count <= 0) {
-                                    heatmap.setData(data);
-                                }
-                            },
-                            function (err) {
-                                alert(err);
-                            }
-                        );
+                        myGeocoder.then(function(res) {
+                            address[element] = res.geoObjects.get(0).geometry.getCoordinates();
+                            console.log((count * 1 + 1.0) + ': ' + element + ' ' + address[element][0] + ', ' + address[element][1]);
+                            putCoords(element, address[element][0], address[element][1]);
+                            data.push(address[element]);
+                            count--;
+                        });
                     }
                 }
+                if(count <= 0) {
+                    heatmap.setData(data);
+                }
+            }
+            else {
+                count--;
             }
         });
     }
